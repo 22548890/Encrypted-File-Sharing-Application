@@ -1,7 +1,5 @@
 import java.io.*;
 import java.net.*;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.awt.*;
 import java.awt.event.*;
@@ -30,8 +28,6 @@ public class Client implements ActionListener {
     private JList<String> roomsList;
 
     public static ArrayList<File> uploadedFiles;
-    // private String uploadsDir;
-    public static String downloadsDir;
 
     public static ArrayList<String> searchFiles;
     public static ArrayList<String> searchNames;
@@ -52,14 +48,7 @@ public class Client implements ActionListener {
         searchFiles = new ArrayList<String>();
         searchNames = new ArrayList<String>();
         searchNum = -1;
-
-        // this.uploadsDir = "uploads";
-        downloadsDir = "downloads/";
-        if (System.getProperty("user.dir").endsWith("src")) {
-            // this.uploadsDir = "../uploads";
-            downloadsDir = "../downloads/";
-        }
-
+        
         frame = new JFrame();
 
         btnUpload = new JButton();

@@ -21,7 +21,7 @@ public class ReceiveThread implements Runnable {
             String fileName = (String) ois.readObject();
             byte[] bytes = (byte[]) ois.readObject();
 
-            try (FileOutputStream fos = new FileOutputStream(Client.downloadsDir + fileName)) {
+            try (FileOutputStream fos = new FileOutputStream(fileName)) {
                 fos.write(bytes);
             }
         } catch (IOException e) {
