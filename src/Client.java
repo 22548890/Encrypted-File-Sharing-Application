@@ -21,6 +21,7 @@ public class Client implements ActionListener {
     private JTextArea enteredText;
     private JTextField typedText;
     public static JProgressBar progressBar;
+    public static boolean isPaused = false;
 
     private DefaultListModel<String> listModelUsers;
     private JList<String> usersList;
@@ -47,6 +48,7 @@ public class Client implements ActionListener {
         searchFiles = new ArrayList<String>();
         searchNames = new ArrayList<String>();
         searchNum = -1;
+        isPaused = false;
 
         // this.uploadsDir = "uploads";
         // downloadsDir = "downloads/";
@@ -96,7 +98,30 @@ public class Client implements ActionListener {
         progressBar.setVisible(true);
 
         panel1.add(new JScrollPane(usersList));
-        panel1.add(progressBar);
+
+        // content.add(panel1, BorderLayout.EAST);
+        JPanel panel2 = new JPanel();
+
+        panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
+        panel2.add(progressBar);
+        JButton btnPause = new JButton("Pause");
+        // try {
+        // Image img = ImageIO.read(getClass().getResource("/icons/pause.png"));
+        // btnPause.setIcon(new ImageIcon(img));
+        // } catch (Exception ex) {
+        // System.out.println(ex);
+        // }
+        // if paused clicked change boolean to true
+        btnPause.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // alternate state of isPaused
+                isPaused = !isPaused;
+            }
+        });
+        btnPause.setSize(50, 10);
+
+        panel2.add(btnPause);
+        panel1.add(panel2);
         content.add(panel1, BorderLayout.EAST);
         content.add(roomsList, BorderLayout.WEST);
 
@@ -139,6 +164,7 @@ public class Client implements ActionListener {
                     uploadedFiles.add(file);
                 }
             }
+
         } else {
             String text = typedText.getText();
 

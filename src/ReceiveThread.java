@@ -7,6 +7,7 @@ import javax.swing.JProgressBar;
 
 public class ReceiveThread implements Runnable {
     private JProgressBar progressBar;
+    private boolean isPaused;
 
     public ReceiveThread(JProgressBar progressBar) {
         this.progressBar = progressBar;
@@ -37,10 +38,22 @@ public class ReceiveThread implements Runnable {
                 totalRead += read;
                 remaining -= read;
                 // System.out.println("read " + totalRead + " bytes.");
+                // if paused, wait
+                isPaused = Client.isPaused;
+                while (isPaused) {
+                    isPaused = Client.isPaused;
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("paused");
+                }
                 fos.write(buffer, 0, read);
                 progressBar.setValue((int) (totalRead * 100 / fileSize));
+
                 try {
-                    Thread.sleep(10);
+                    Thread.sleep(5);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
