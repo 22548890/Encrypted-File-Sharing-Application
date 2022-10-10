@@ -7,7 +7,6 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 
-
 public class Client implements ActionListener {
 
     private String username;
@@ -21,7 +20,8 @@ public class Client implements ActionListener {
     private JButton btnUpload;
     private JTextArea enteredText;
     private JTextField typedText;
-    
+    public static JProgressBar progressBar;
+
     private DefaultListModel<String> listModelUsers;
     private JList<String> usersList;
     private DefaultListModel<String> listModelRooms;
@@ -32,7 +32,6 @@ public class Client implements ActionListener {
     public static ArrayList<String> searchFiles;
     public static ArrayList<String> searchNames;
     public static int searchNum;
-
 
     /**
      * Constructor forPerforms actions regarding the GUI
@@ -48,7 +47,14 @@ public class Client implements ActionListener {
         searchFiles = new ArrayList<String>();
         searchNames = new ArrayList<String>();
         searchNum = -1;
-        
+
+        // this.uploadsDir = "uploads";
+        // downloadsDir = "downloads/";
+        // if (System.getProperty("user.dir").endsWith("src")) {
+        // // this.uploadsDir = "../uploads";
+        // downloadsDir = "../downloads/";
+        // }
+
         frame = new JFrame();
 
         btnUpload = new JButton();
@@ -66,7 +72,7 @@ public class Client implements ActionListener {
 
         listModelUsers = new DefaultListModel<String>();
         listModelUsers.addElement("Online Users:");
-        
+
         listModelRooms = new DefaultListModel<String>();
         listModelRooms.addElement("Rooms:   ");
 
@@ -81,8 +87,17 @@ public class Client implements ActionListener {
 
         Container content = frame.getContentPane();
         content.add(new JScrollPane(enteredText), BorderLayout.CENTER);
-       
-        content.add(usersList, BorderLayout.EAST);
+
+        JPanel panel1 = new JPanel();
+        panel1.setLayout(new BoxLayout(panel1, BoxLayout.Y_AXIS));
+        progressBar = new JProgressBar();
+        progressBar.setStringPainted(true);
+        progressBar.setSize(50, 10);
+        progressBar.setVisible(true);
+
+        panel1.add(new JScrollPane(usersList));
+        panel1.add(progressBar);
+        content.add(panel1, BorderLayout.EAST);
         content.add(roomsList, BorderLayout.WEST);
 
         enteredText.setPreferredSize(new Dimension(300, 50));
@@ -97,12 +112,10 @@ public class Client implements ActionListener {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
-        frame.setTitle("Client: " + username + "    |    Room: General" );
-
+        frame.setTitle("Client: " + username + "    |    Room: General");
 
         typedText.requestFocusInWindow();
     }
-
 
     /**
      * Performs actions regarding the GUI and calls sendMessage
@@ -115,13 +128,14 @@ public class Client implements ActionListener {
             JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
             jfc.setDialogTitle("Choose a files to upload: ");
             jfc.setMultiSelectionEnabled(true);
-		    jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
             int returnValue = jfc.showDialog(null, "Upload");
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 File[] files = jfc.getSelectedFiles();
                 for (File file : files) {
-                    // Files.copy(file.toPath(), new File(uploadsDir, file.getName()).toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    // Files.copy(file.toPath(), new File(uploadsDir, file.getName()).toPath(),
+                    // StandardCopyOption.REPLACE_EXISTING);
                     uploadedFiles.add(file);
                 }
             }
@@ -129,12 +143,11 @@ public class Client implements ActionListener {
             String text = typedText.getText();
 
             sendMessage(text);
-    
+
             typedText.setText("");
             typedText.requestFocusInWindow();
         }
     }
-
 
     /**
      * Handles messages typed in input area
@@ -187,7 +200,8 @@ public class Client implements ActionListener {
                 searchNames = new ArrayList<String>();
             } else if (text.startsWith("/download ")) {
                 if (text.equals("/download ")) {
-                    enteredText.insert("Usage: /download <index corresponding to searched file>\n", enteredText.getText().length());
+                    enteredText.insert("Usage: /download <index corresponding to searched file>\n",
+                            enteredText.getText().length());
                     return;
                 }
                 String index = text.split(" ", 2)[1];
@@ -210,7 +224,7 @@ public class Client implements ActionListener {
                 }
                 text = "@" + searchNames.get(num) + " /download " + ip + " " + searchFiles.get(num);
 
-                Thread thread = new Thread(new ReceiveThread());
+                Thread thread = new Thread(new ReceiveThread(progressBar));
                 thread.start();
             } else {
                 enteredText.insert(help, enteredText.getText().length());
@@ -220,7 +234,7 @@ public class Client implements ActionListener {
 
         try {
             Message msg = new Message(text, username);
-            
+
             oos.writeObject(msg);
             oos.flush();
         } catch (IOException e) {
@@ -229,17 +243,16 @@ public class Client implements ActionListener {
         }
     }
 
-
     /**
      * Creates the thread that listens for messages
      */
     public void listenForMessage() {
-        ClientListenerThread clientListenerThread = new ClientListenerThread(username, socket, ois, oos, frame, enteredText,
+        ClientListenerThread clientListenerThread = new ClientListenerThread(username, socket, ois, oos, frame,
+                enteredText,
                 listModelUsers, listModelRooms);
         Thread thread = new Thread(clientListenerThread);
         thread.start(); // waiting for msgs
     }
-
 
     /**
      * Closes socket and streams neatly
@@ -261,7 +274,6 @@ public class Client implements ActionListener {
         System.exit(0);
     }
 
-
     /**
      * Closes socket and streams neatly before final connection is made
      */
@@ -282,8 +294,7 @@ public class Client implements ActionListener {
         System.exit(0);
     }
 
-
-    /** 
+    /**
      * Starts of the client side
      */
     public static void main(String[] args) {

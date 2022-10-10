@@ -27,18 +27,16 @@ public class SendThread implements Runnable {
         for (File file : Client.uploadedFiles) {
             if (file.getName().equals(fileName)) {
                 try {
-                    FileInputStream fileIn = new FileInputStream(file); 
-                    byte[] bytes = new byte[(int)file.length()];
-                    fileIn.read(bytes);
+                    FileInputStream fileIn = new FileInputStream(file);
+                    int bytes = 0;
+                    byte[] buffer = new byte[4 * 1024];
+                    oos.writeObject(file.getName());
+                    oos.writeObject(file.length());
+                    while ((bytes = fileIn.read(buffer)) != -1) {
+                        oos.write(buffer, 0, bytes);
+                    }
+                    oos.flush();
                     fileIn.close();
-
-
-
-                    oos.writeObject(fileName);
-                    oos.flush();
-                    
-                    oos.writeObject(bytes);
-                    oos.flush();
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -57,5 +55,5 @@ public class SendThread implements Runnable {
 
         }
     }
-    
+
 }
