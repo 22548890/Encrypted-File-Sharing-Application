@@ -16,7 +16,7 @@ public class SendThread implements Runnable {
     public void run() {
         int port = 12346;
 
-        Socket socket;
+        Socket socket = null;
         ObjectOutputStream oos = null;
         try {
             socket = new Socket(host, port);
@@ -44,6 +44,17 @@ public class SendThread implements Runnable {
                     e.printStackTrace();
                 }
             }
+        }
+
+        try {
+            if (oos != null) {
+                oos.close();
+            }
+            if (socket != null) {
+                socket.close();
+            }
+        } catch (IOException e) {
+
         }
     }
     

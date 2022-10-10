@@ -182,7 +182,6 @@ public class ClientHandler implements Runnable {
             text = parts[1];
         }
         if(text.startsWith("/download ")) {
-            System.out.println("KaKKKAKAKAKAKKAKAKKA");
             for (ClientHandler handler : clientHandlers) {
                 if (handler.username.equals(usernames.get(0))) {
                     try {

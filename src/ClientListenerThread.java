@@ -150,7 +150,7 @@ public class ClientListenerThread implements Runnable {
             }
             return;
         } else if (message.text().startsWith("/download ")) {
-            String parts[] = message.text().split(" ");
+            String parts[] = message.text().split(" ", 3);
             String host = parts[1];
             String filename = parts[2];
             Thread thread = new Thread(new SendThread(host, filename));

@@ -10,9 +10,9 @@ public class ReceiveThread implements Runnable {
     public void run() {
         int port = 12346;
 
-        ServerSocket serverSocket;
-        Socket socket;
-        ObjectInputStream ois;
+        ServerSocket serverSocket = null;
+        Socket socket = null;
+        ObjectInputStream ois = null;
         try {
             serverSocket = new ServerSocket(port);
             socket = serverSocket.accept();
@@ -30,6 +30,19 @@ public class ReceiveThread implements Runnable {
             e.printStackTrace();
         }
         
+        try {
+            if (ois != null) {
+                ois.close();
+            }
+            if (socket != null) {
+                socket.close();
+            }
+            if (serverSocket != null) {
+                serverSocket.close();
+            }
+        } catch (IOException e) {
+
+        }
         
     }
     
