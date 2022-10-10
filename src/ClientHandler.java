@@ -181,6 +181,22 @@ public class ClientHandler implements Runnable {
             usernames.add(parts[0].substring(1));
             text = parts[1];
         }
+        if(text.startsWith("/download ")) {
+            System.out.println("KaKKKAKAKAKAKKAKAKKA");
+            for (ClientHandler handler : clientHandlers) {
+                if (handler.username.equals(usernames.get(0))) {
+                    try {
+                        handler.oos.writeObject(new Message(text, msg.from()));
+                        handler.oos.flush();
+                    } catch (IOException e) {
+                        closeEverything();
+                        return;
+                    }
+                    return;
+                }
+            }
+            return;
+        }
 
         // send to users an
         String txt = "whispers to";

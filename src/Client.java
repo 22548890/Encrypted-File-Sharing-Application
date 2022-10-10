@@ -29,9 +29,13 @@ public class Client implements ActionListener {
     private DefaultListModel<String> listModelRooms;
     private JList<String> roomsList;
 
-    public static ArrayList<String> fileNames;
-    private String uploadsDir;
-    private String downloadsDir;
+    public static ArrayList<File> uploadedFiles;
+    // private String uploadsDir;
+    public static String downloadsDir;
+
+    public static ArrayList<String> searchFiles;
+    public static ArrayList<String> searchNames;
+    public static int searchNum;
 
 
     /**
@@ -44,13 +48,16 @@ public class Client implements ActionListener {
         this.ois = ois;
         this.oos = oos;
         this.username = username;
-        fileNames = new ArrayList<String>();
+        uploadedFiles = new ArrayList<File>();
+        searchFiles = new ArrayList<String>();
+        searchNames = new ArrayList<String>();
+        searchNum = -1;
 
-        this.uploadsDir = "uploads";
-        this.downloadsDir = "downloads";
+        // this.uploadsDir = "uploads";
+        downloadsDir = "downloads/";
         if (System.getProperty("user.dir").endsWith("src")) {
-            this.uploadsDir = "../uploads";
-            this.downloadsDir = "../downloads";
+            // this.uploadsDir = "../uploads";
+            downloadsDir = "../downloads/";
         }
 
         frame = new JFrame();
@@ -125,12 +132,8 @@ public class Client implements ActionListener {
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 File[] files = jfc.getSelectedFiles();
                 for (File file : files) {
-                    try {
-                        Files.copy(file.toPath(), new File(uploadsDir, file.getName()).toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        fileNames.add(file.getName());
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
+                    // Files.copy(file.toPath(), new File(uploadsDir, file.getName()).toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    uploadedFiles.add(file);
                 }
             }
         } else {
@@ -159,37 +162,67 @@ public class Client implements ActionListener {
                 return;
             } else if (text.startsWith("/create ")) {
                 if (text.equals("/create ")) {
-                    enteredText.insert("SERVER: Usage - /create <room>\n", enteredText.getText().length());
+                    enteredText.insert("Usage: /create <room>\n", enteredText.getText().length());
                     return;
                 }
                 String room = "";
                 try {
                     room = text.split("/create ", 2)[1];
                 } catch (Exception e) {
-                    enteredText.insert("SERVER: Usage - /create <room>\n", enteredText.getText().length());
+                    enteredText.insert("Usage: /create <room>\n", enteredText.getText().length());
                     return;
                 }
                 if (room.isBlank() || !room.matches("^[0-9A-Za-z]*$")) {
-                    enteredText.insert("SERVER: Usage - /create <room>\n", enteredText.getText().length());
+                    enteredText.insert("Usage: /create <room>\n", enteredText.getText().length());
                     return;
                 }
             } else if (text.startsWith("/join ")) {
                 if (text.equals("/join ")) {
-                    enteredText.insert("SERVER: Usage - /join <room>\n", enteredText.getText().length());
+                    enteredText.insert("Usage: /join <room>\n", enteredText.getText().length());
                     return;
                 }
                 roomToJoin = text.split("/join ", 2)[1];
             } else if (text.equals("/myfiles")) {
                 enteredText.insert("Uploaded Files:\n", enteredText.getText().length());
-                for (String name : fileNames) {
-                    enteredText.insert("- " + name + "\n", enteredText.getText().length());
+                for (File file : uploadedFiles) {
+                    enteredText.insert("- " + file.getName() + "\n", enteredText.getText().length());
                 }
                 return;
             } else if (text.startsWith("/search ")) {
                 if (text.equals("/search ")) {
-                    enteredText.insert("SERVER: Usage - /search <string>\n", enteredText.getText().length());
+                    enteredText.insert("Usage: /search <string>\n", enteredText.getText().length());
                     return;
                 }
+                searchNum = -1;
+                searchFiles = new ArrayList<String>();
+                searchNames = new ArrayList<String>();
+            } else if (text.startsWith("/download ")) {
+                if (text.equals("/download ")) {
+                    enteredText.insert("Usage: /download <index corresponding to searched file>\n", enteredText.getText().length());
+                    return;
+                }
+                String index = text.split(" ", 2)[1];
+                int num = -1;
+                try {
+                    num = Integer.parseInt(index);
+                } catch (NumberFormatException e) {
+                    enteredText.insert("Index given is not an integer", enteredText.getText().length());
+                    return;
+                }
+                if (num < 0 || num >= searchFiles.size()) {
+                    enteredText.insert("Index is out of bounds", enteredText.getText().length());
+                    return;
+                }
+                String ip = "";
+                try {
+                    ip = InetAddress.getLocalHost().getHostAddress();
+                } catch (UnknownHostException e) {
+                    e.printStackTrace();
+                }
+                text = "@" + searchNames.get(num) + " /download " + ip + " " + searchFiles.get(num);
+
+                Thread thread = new Thread(new ReceiveThread());
+                thread.start();
             } else {
                 enteredText.insert(help, enteredText.getText().length());
                 return;

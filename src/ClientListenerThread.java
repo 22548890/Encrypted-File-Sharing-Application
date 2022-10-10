@@ -45,18 +45,18 @@ public class ClientListenerThread implements Runnable {
 
 
     public String search(String str) {
-        ArrayList<String> files = Client.fileNames;
+        ArrayList<File> files = Client.uploadedFiles;
         boolean[] included = new boolean[files.size()];
         for (int i = 0; i < included.length; i++) {
             included[i] = false;
         }
-        String result = "/results Search results for " + str + " from " + username + ":\n";
+        String result = "/results ";
 
 
         // add exact matches
         for (int i = 0; i < files.size(); i++) {
-            if (files.get(i).toLowerCase().equals(str.toLowerCase())) {
-                result += "- " + files.get(i) + "\n";
+            if (files.get(i).getName().toLowerCase().equals(str.toLowerCase())) {
+                result += files.get(i) + "@";
                 included[i] = true;
             }
         }
@@ -64,8 +64,8 @@ public class ClientListenerThread implements Runnable {
         if (str.length() < 3) {
             // substring
             for (int i = 0; i < files.size(); i++) { // might be smaller than 3
-                if (files.get(i).toLowerCase().contains(str.toLowerCase()) && included[i] == false) {
-                    result += "- " + files.get(i) + "\n";
+                if (files.get(i).getName().toLowerCase().contains(str.toLowerCase()) && included[i] == false) {
+                    result += files.get(i).getName() + "@";
                     included[i] = true;
                 }
             }
@@ -75,10 +75,10 @@ public class ClientListenerThread implements Runnable {
                 for (int j = 0; j < files.size(); j++) {
                     for (int k = 0; k <= str.length() - i; k++) {
                         String substr = str.substring(k, i + k);
-                        if (files.get(j).toLowerCase().contains(substr.toLowerCase()) && included[j] == false) {
-                            result += "- " + files.get(j) + "\n";
+                        if (files.get(j).getName().toLowerCase().contains(substr.toLowerCase()) && included[j] == false) {
+                            result += files.get(j).getName() + "@";
                             included[j] = true;
-                            System.out.println(files.get(j).toLowerCase());
+                            System.out.println(files.get(j).getName().toLowerCase());
                             System.out.println(substr.toLowerCase());
                         }
                     }
@@ -127,6 +127,9 @@ public class ClientListenerThread implements Runnable {
                 return;
             }
             String result = search(message.text().split("/search ", 2)[1]);
+            if (result.equals("/results ")) {
+                return;
+            }
             try {
                 oos.writeObject(new Message(result, username, message.from()));
                 oos.flush();
@@ -134,9 +137,24 @@ public class ClientListenerThread implements Runnable {
                 e.printStackTrace();
             }
             return;
-        } else if (message.text().startsWith("/results")) {
+        } else if (message.text().startsWith("/results ")) {
             String text = message.text().split("/results ")[1];
-            enteredText.insert(text + "\n", enteredText.getText().length());
+            String[] files = text.split("@");
+            for(String file : files) {
+                Client.searchFiles.add(file);
+                Client.searchNames.add(message.from());
+                Client.searchNum++;
+
+                String line = Client.searchNum + " - " + file + "\n";
+                enteredText.insert(line, enteredText.getText().length());
+            }
+            return;
+        } else if (message.text().startsWith("/download ")) {
+            String parts[] = message.text().split(" ");
+            String host = parts[1];
+            String filename = parts[2];
+            Thread thread = new Thread(new SendThread(host, filename));
+            thread.start();
             return;
         }
         String text = message.from() + ": " + message.text();
