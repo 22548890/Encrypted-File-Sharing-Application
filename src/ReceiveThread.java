@@ -1,6 +1,7 @@
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import javax.swing.JProgressBar;
@@ -47,29 +48,16 @@ public class ReceiveThread implements Runnable {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    System.out.println("paused");
+                    // System.out.println("paused");
                 }
                 fos.write(buffer, 0, read);
                 progressBar.setValue((int) (totalRead * 100 / fileSize));
 
                 try {
-                    Thread.sleep(5);
+                    Thread.sleep(10);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-
-                // try (FileOutputStream fos = new FileOutputStream(fileName)) {
-
-                // fos.write(bytes)
-
-                // for (int i = 0; i <= 100; i++) {
-                // progressBar.setValue(i);
-                // try {
-                // Thread.sleep(100);
-                // } catch (InterruptedException e) {
-                // e.printStackTrace();
-                // }
-                // }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -87,6 +75,12 @@ public class ReceiveThread implements Runnable {
             if (serverSocket != null) {
                 serverSocket.close();
             }
+            try {
+                Thread.sleep(4000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            progressBar.setValue(0);
         } catch (IOException e) {
 
         }

@@ -21,7 +21,9 @@ public class Client implements ActionListener {
     private JTextArea enteredText;
     private JTextField typedText;
     public static JProgressBar progressBar;
+    public static JProgressBar progressBarUpload;
     public static boolean isPaused = false;
+    public static boolean isPausedUpload = false;
 
     private DefaultListModel<String> listModelUsers;
     private JList<String> usersList;
@@ -93,9 +95,20 @@ public class Client implements ActionListener {
         JPanel panel1 = new JPanel();
         panel1.setLayout(new BoxLayout(panel1, BoxLayout.Y_AXIS));
         progressBar = new JProgressBar();
+        progressBarUpload = new JProgressBar();
+
         progressBar.setStringPainted(true);
         progressBar.setSize(50, 10);
         progressBar.setVisible(true);
+        progressBar.setString("Download");
+        // set color to green
+        progressBar.setForeground(Color.GREEN);
+        progressBarUpload.setStringPainted(true);
+        progressBarUpload.setSize(50, 10);
+        progressBarUpload.setVisible(true);
+        progressBarUpload.setString("Upload");
+        // set color to blue
+        progressBarUpload.setForeground(Color.BLUE);
 
         panel1.add(new JScrollPane(usersList));
 
@@ -104,24 +117,61 @@ public class Client implements ActionListener {
 
         panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
         panel2.add(progressBar);
+
         JButton btnPause = new JButton("Pause");
-        // try {
-        // Image img = ImageIO.read(getClass().getResource("/icons/pause.png"));
-        // btnPause.setIcon(new ImageIcon(img));
-        // } catch (Exception ex) {
-        // System.out.println(ex);
-        // }
-        // if paused clicked change boolean to true
+        JButton btnPauseUpload = new JButton("Pause");
         btnPause.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // alternate state of isPaused
                 isPaused = !isPaused;
+                if (isPaused) {
+                    btnPause.setText("Resume");
+                } else {
+                    btnPause.setText("Pause");
+                }
+            }
+        });
+        btnPauseUpload.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // alternate state of isPaused
+                isPausedUpload = !isPausedUpload;
+                if (isPausedUpload) {
+                    btnPauseUpload.setText("Resume");
+                    // send /paused message object
+                    try {
+                        oos.writeObject(new Message("/paused", username));
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                } else {
+                    btnPauseUpload.setText("Pause");
+                    // send /resumed message object
+                    try {
+                        oos.writeObject(new Message("/resumed", username));
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+                // send message /paused
+
             }
         });
         btnPause.setSize(50, 10);
+        btnPauseUpload.setSize(50, 10);
 
         panel2.add(btnPause);
-        panel1.add(panel2);
+
+        JPanel panel3 = new JPanel();
+        panel3.setLayout(new BoxLayout(panel3, BoxLayout.X_AXIS));
+        panel3.add(progressBarUpload);
+        // panel3.add(btnPauseUpload);
+
+        JPanel panel4 = new JPanel();
+        panel4.setLayout(new BoxLayout(panel4, BoxLayout.Y_AXIS));
+        panel4.add(panel2);
+        panel4.add(panel3);
+
+        panel1.add(panel4);
         content.add(panel1, BorderLayout.EAST);
         content.add(roomsList, BorderLayout.WEST);
 
@@ -275,7 +325,7 @@ public class Client implements ActionListener {
     public void listenForMessage() {
         ClientListenerThread clientListenerThread = new ClientListenerThread(username, socket, ois, oos, frame,
                 enteredText,
-                listModelUsers, listModelRooms);
+                listModelUsers, listModelRooms, progressBarUpload);
         Thread thread = new Thread(clientListenerThread);
         thread.start(); // waiting for msgs
     }

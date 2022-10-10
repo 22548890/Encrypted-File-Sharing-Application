@@ -3,7 +3,6 @@ import java.net.*;
 import java.util.*;
 import javax.swing.*;
 
-
 /**
  * This class is for the thread that waits for messages
  */
@@ -19,7 +18,8 @@ public class ClientListenerThread implements Runnable {
     private JTextArea enteredText;
     private DefaultListModel<String> listModelUsers;
     private DefaultListModel<String> listModelRooms;
-
+    private JProgressBar progressBar;
+    public static boolean isPaused;
 
     /**
      * Constructor sets up useful properties
@@ -31,8 +31,10 @@ public class ClientListenerThread implements Runnable {
      * @param listModel   for displaying list of users
      * @param frame       for displaying everything
      */
-    public ClientListenerThread(String username, Socket socket, ObjectInputStream ois, ObjectOutputStream oos, JFrame frame,
-            JTextArea enteredText, DefaultListModel<String> listModelUsers, DefaultListModel<String> listModelRooms) {
+    public ClientListenerThread(String username, Socket socket, ObjectInputStream ois, ObjectOutputStream oos,
+            JFrame frame,
+            JTextArea enteredText, DefaultListModel<String> listModelUsers, DefaultListModel<String> listModelRooms,
+            JProgressBar progressBar) {
         this.username = username;
         this.socket = socket;
         this.ois = ois;
@@ -41,8 +43,8 @@ public class ClientListenerThread implements Runnable {
         this.enteredText = enteredText;
         this.listModelUsers = listModelUsers;
         this.listModelRooms = listModelRooms;
+        this.progressBar = progressBar;
     }
-
 
     public String search(String str) {
         ArrayList<File> files = Client.uploadedFiles;
@@ -52,7 +54,6 @@ public class ClientListenerThread implements Runnable {
         }
         String result = "/results ";
 
-
         // add exact matches
         for (int i = 0; i < files.size(); i++) {
             if (files.get(i).getName().toLowerCase().equals(str.toLowerCase())) {
@@ -60,7 +61,7 @@ public class ClientListenerThread implements Runnable {
                 included[i] = true;
             }
         }
-        
+
         if (str.length() < 3) {
             // substring
             for (int i = 0; i < files.size(); i++) { // might be smaller than 3
@@ -75,7 +76,8 @@ public class ClientListenerThread implements Runnable {
                 for (int j = 0; j < files.size(); j++) {
                     for (int k = 0; k <= str.length() - i; k++) {
                         String substr = str.substring(k, i + k);
-                        if (files.get(j).getName().toLowerCase().contains(substr.toLowerCase()) && included[j] == false) {
+                        if (files.get(j).getName().toLowerCase().contains(substr.toLowerCase())
+                                && included[j] == false) {
                             result += files.get(j).getName() + "@";
                             included[j] = true;
                             System.out.println(files.get(j).getName().toLowerCase());
@@ -87,7 +89,6 @@ public class ClientListenerThread implements Runnable {
         }
         return result;
     }
-
 
     /**
      * Handles the output of received messages
@@ -140,7 +141,7 @@ public class ClientListenerThread implements Runnable {
         } else if (message.text().startsWith("/results ")) {
             String text = message.text().split("/results ")[1];
             String[] files = text.split("@");
-            for(String file : files) {
+            for (String file : files) {
                 Client.searchFiles.add(file);
                 Client.searchNames.add(message.from());
                 Client.searchNum++;
@@ -153,14 +154,23 @@ public class ClientListenerThread implements Runnable {
             String parts[] = message.text().split(" ", 3);
             String host = parts[1];
             String filename = parts[2];
-            Thread thread = new Thread(new SendThread(host, filename));
+            Thread thread = new Thread(new SendThread(host, filename, progressBar));
             thread.start();
             return;
+        }
+        // else if paused pause sending
+        else {
+            if (message.text().startsWith("/pause")) {
+                isPaused = true;
+                return;
+            } else if (message.text().startsWith("/resume")) {
+                isPaused = false;
+                return;
+            }
         }
         String text = message.from() + ": " + message.text();
         enteredText.insert(text + "\n", enteredText.getText().length());
     }
-
 
     /**
      * Closes socket and streams neatly and exits
@@ -195,7 +205,6 @@ public class ClientListenerThread implements Runnable {
         }
         System.exit(0);
     }
-
 
     /**
      * Thread execution that waits for messages while connected to server

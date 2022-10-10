@@ -1,15 +1,17 @@
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
+import javax.swing.JProgressBar;
 
 public class SendThread implements Runnable {
     private String host, fileName;
+    // private boolean isPausedUploaded;
+    private JProgressBar progressBar;
 
-    public SendThread(String host, String fileName) {
+    public SendThread(String host, String fileName, JProgressBar progressBar) {
         this.host = host;
         this.fileName = fileName;
+        this.progressBar = progressBar;
+
     }
 
     @Override
@@ -32,11 +34,32 @@ public class SendThread implements Runnable {
                     byte[] buffer = new byte[4 * 1024];
                     oos.writeObject(file.getName());
                     oos.writeObject(file.length());
+                    int fileSize = (int) file.length();
+                    int sent = 0;
+                    // progressBar.setIndeterminate(true);
                     while ((bytes = fileIn.read(buffer)) != -1) {
+                        // calculate sending amount remaining and add to progress bar
+                        sent += bytes;
+                        progressBar.setValue((int) (sent * 100 / fileSize));
+
+                        try {
+                            Thread.sleep(10);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                         oos.write(buffer, 0, bytes);
                     }
                     oos.flush();
                     fileIn.close();
+                    // if clientliostener is paused, wait until false
+
+                    try {
+                        Thread.sleep(4000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    progressBar.setValue(0);
+                    progressBar.setIndeterminate(false);
 
                 } catch (IOException e) {
                     e.printStackTrace();
