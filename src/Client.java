@@ -382,9 +382,7 @@ public class Client implements ActionListener {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-        while (ip.isBlank()) {
-            ip = JOptionPane.showInputDialog("Enter your IP address: ", ip);
-        }
+        ip = JOptionPane.showInputDialog("Enter your IP address: ", ip);
 
         String serverIP = "";
         while (serverIP.isBlank()) {
