@@ -4,14 +4,16 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import javax.swing.JProgressBar;
+import javax.swing.*;
 
 public class ReceiveThread implements Runnable {
     private JProgressBar progressBar;
     private boolean isPaused;
+    private JTextArea enteredText;
 
-    public ReceiveThread(JProgressBar progressBar) {
+    public ReceiveThread(JProgressBar progressBar, JTextArea enteredText) {
         this.progressBar = progressBar;
+        this.enteredText = enteredText;
     }
 
     @Override
@@ -21,12 +23,13 @@ public class ReceiveThread implements Runnable {
         ServerSocket serverSocket = null;
         Socket socket = null;
         ObjectInputStream ois = null;
+        String fileName = null;
         try {
             serverSocket = new ServerSocket(port);
             socket = serverSocket.accept();
             ois = new ObjectInputStream(socket.getInputStream());
 
-            String fileName = (String) ois.readObject();
+            fileName = (String) ois.readObject();
             // receive file in chuncks amd update progressBar
             long size = (long) ois.readObject();
             int fileSize = (int) size;
@@ -54,7 +57,12 @@ public class ReceiveThread implements Runnable {
                 progressBar.setValue((int) (totalRead * 100 / fileSize));
 
                 try {
-                    Thread.sleep(10);
+                    // if file size is > 5MB, sleep for 1ms
+                    if (fileSize > 5 * 1024 * 1024) {
+                        Thread.sleep(0);
+                    } else {
+                        Thread.sleep(10);
+                    }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -75,6 +83,7 @@ public class ReceiveThread implements Runnable {
             if (serverSocket != null) {
                 serverSocket.close();
             }
+            enteredText.insert("File " + fileName + " received successfully.\n", enteredText.getText().length());
             try {
                 Thread.sleep(4000);
             } catch (InterruptedException e) {

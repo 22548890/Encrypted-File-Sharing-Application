@@ -203,11 +203,11 @@ public class Client implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnUpload) {
             JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
-            jfc.setDialogTitle("Choose a files to upload: ");
+            jfc.setDialogTitle("Choose file/files: ");
             jfc.setMultiSelectionEnabled(true);
             jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
-            int returnValue = jfc.showDialog(null, "Upload");
+            int returnValue = jfc.showDialog(null, "Select");
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 File[] files = jfc.getSelectedFiles();
                 for (File file : files) {
@@ -234,7 +234,7 @@ public class Client implements ActionListener {
      */
     public void sendMessage(String text) {
         if (text.startsWith("/")) {
-            String help = "Commands: \n- /exit - shut down application\n- /create <name> - create room\n- /join <room> - join that room\n- /myfiles - list of my uploaded files\n- /help - show help\n";
+            String help = "Commands: \n- /exit - shut down application\n- /create <name> - create room\n- /join <room> - join that room\n- /myfiles - list of my uploaded files\n - /search - search for file substring name\n - /download - request to download file\n- /help - show help\n";
             if (text.equals("/exit")) {
                 closeEverything();
             } else if (text.equals("/help")) {
@@ -298,7 +298,7 @@ public class Client implements ActionListener {
                 text = "@" + searchNames.get(num) + " /download " + ip + " " + searchFiles.get(num);
                 System.out.println(ip);
 
-                Thread thread = new Thread(new ReceiveThread(progressBar));
+                Thread thread = new Thread(new ReceiveThread(progressBar, enteredText));
                 thread.start();
             } else {
                 enteredText.insert(help, enteredText.getText().length());
