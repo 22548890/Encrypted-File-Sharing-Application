@@ -36,6 +36,8 @@ public class Client implements ActionListener {
     public static ArrayList<String> searchNames;
     public static int searchNum;
 
+    public static String ip;
+
     /**
      * Constructor forPerforms actions regarding the GUI
      * 
@@ -292,13 +294,9 @@ public class Client implements ActionListener {
                     enteredText.insert("Index is out of bounds", enteredText.getText().length());
                     return;
                 }
-                String ip = "";
-                try {
-                    ip = InetAddress.getLocalHost().getHostAddress();
-                } catch (UnknownHostException e) {
-                    e.printStackTrace();
-                }
+            
                 text = "@" + searchNames.get(num) + " /download " + ip + " " + searchFiles.get(num);
+                System.out.println(ip);
 
                 Thread thread = new Thread(new ReceiveThread(progressBar));
                 thread.start();
@@ -377,18 +375,23 @@ public class Client implements ActionListener {
         int port = 12345;
         Socket socket = null;
 
-        String ip = "";
+        ip = "";
         while (ip.isBlank()) {
-            ip = JOptionPane.showInputDialog("Enter the server IP address: ", "localhost");
+            ip = JOptionPane.showInputDialog("Enter your IP address: ");
+        }
+
+        String serverIP = "";
+        while (serverIP.isBlank()) {
+            serverIP = JOptionPane.showInputDialog("Enter the server IP address: ", "localhost");
         }
 
         try {
-            socket = new Socket(ip, port);
+            socket = new Socket(serverIP, port);
         } catch (UnknownHostException e) {
             System.out.println("ERROR: Unknown host");
             System.exit(0);
         } catch (IOException e) {
-            System.out.println("ERROR: Couldn't get the connection to " + ip);
+            System.out.println("ERROR: Couldn't get the connection to " + serverIP);
             System.exit(0);
         }
 

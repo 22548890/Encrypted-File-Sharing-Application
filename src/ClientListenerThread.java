@@ -80,8 +80,6 @@ public class ClientListenerThread implements Runnable {
                                 && included[j] == false) {
                             result += files.get(j).getName() + "@";
                             included[j] = true;
-                            System.out.println(files.get(j).getName().toLowerCase());
-                            System.out.println(substr.toLowerCase());
                         }
                     }
                 }
