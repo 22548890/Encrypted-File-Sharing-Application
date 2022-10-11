@@ -158,7 +158,7 @@ public class ClientListenerThread implements Runnable {
             // get username of host
 
             int reply = JOptionPane.showConfirmDialog(null,
-                    "Do you accept the download request " + filename + " from " + host + "?", "Download",
+                    "Do you accept the download request " + filename + " from " + message.from() + "?", "Download",
                     JOptionPane.YES_NO_OPTION);
             if (reply == JOptionPane.YES_OPTION) {
                 Thread thread = new Thread(new SendThread(host, filename, progressBar));
