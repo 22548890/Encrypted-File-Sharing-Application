@@ -43,7 +43,13 @@ public class SendThread implements Runnable {
                         progressBar.setValue((int) (sent * 100 / fileSize));
 
                         try {
-                            Thread.sleep(10);
+                            // if file size is > 5MB, sleep for 1ms
+                            if (fileSize > 5 * 1024 * 1024) {
+                                Thread.sleep(0);
+                            } else {
+                                Thread.sleep(10);
+                            }
+
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
