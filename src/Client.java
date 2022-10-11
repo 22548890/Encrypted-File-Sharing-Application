@@ -296,7 +296,6 @@ public class Client implements ActionListener {
                 }
             
                 text = "@" + searchNames.get(num) + " /download " + ip + " " + searchFiles.get(num);
-                System.out.println(ip);
 
                 Thread thread = new Thread(new ReceiveThread(progressBar, enteredText));
                 thread.start();
