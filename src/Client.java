@@ -201,11 +201,11 @@ public class Client implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnUpload) {
             JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
-            jfc.setDialogTitle("Choose a files to upload: ");
+            jfc.setDialogTitle("Choose file/files: ");
             jfc.setMultiSelectionEnabled(true);
             jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
-            int returnValue = jfc.showDialog(null, "Upload");
+            int returnValue = jfc.showDialog(null, "Select");
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 File[] files = jfc.getSelectedFiles();
                 for (File file : files) {
