@@ -31,7 +31,7 @@ public class SendThread implements Runnable {
                 try {
                     FileInputStream fileIn = new FileInputStream(file);
                     int bytes = 0;
-                    byte[] buffer = new byte[4 * 1024];
+                    byte[] buffer = new byte[1 * 1024];
                     oos.writeObject(file.getName());
                     oos.writeObject(file.length());
                     int fileSize = (int) file.length();

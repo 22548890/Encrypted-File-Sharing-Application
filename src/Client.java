@@ -294,7 +294,7 @@ public class Client implements ActionListener {
                     enteredText.insert("Index is out of bounds", enteredText.getText().length());
                     return;
                 }
-            
+
                 text = "@" + searchNames.get(num) + " /download " + ip + " " + searchFiles.get(num);
                 System.out.println(ip);
 
@@ -376,8 +376,14 @@ public class Client implements ActionListener {
         Socket socket = null;
 
         ip = "";
+        // find my ip address
+        try {
+            ip = InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
         while (ip.isBlank()) {
-            ip = JOptionPane.showInputDialog("Enter your IP address: ");
+            ip = JOptionPane.showInputDialog("Enter your IP address: ", ip);
         }
 
         String serverIP = "";

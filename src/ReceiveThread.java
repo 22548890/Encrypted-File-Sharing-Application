@@ -33,7 +33,10 @@ public class ReceiveThread implements Runnable {
             // receive file in chuncks amd update progressBar
             long size = (long) ois.readObject();
             int fileSize = (int) size;
-            byte[] buffer = new byte[4 * 1024];
+
+            // calculate chunk size of size bytes based on fileSize
+
+            byte[] buffer = new byte[1 * 1024];
             int read = 0;
             int totalRead = 0;
             int remaining = fileSize;
