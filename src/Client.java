@@ -54,7 +54,8 @@ public class Client implements ActionListener {
      * @param e for the action performed
      * @throws NoSuchAlgorithmException
      */
-    public Client(Socket socket, ObjectInputStream ois, ObjectOutputStream oos, String username) throws NoSuchAlgorithmException {
+    public Client(Socket socket, ObjectInputStream ois, ObjectOutputStream oos, String username)
+            throws NoSuchAlgorithmException {
         this.socket = socket;
         this.ois = ois;
         this.oos = oos;
@@ -307,7 +308,7 @@ public class Client implements ActionListener {
                     enteredText.insert("Index is out of bounds", enteredText.getText().length());
                     return;
                 }
-            
+
                 key = randomKey();
                 try {
                     encryptedKey = encrypt(keysKey, key);
@@ -316,13 +317,14 @@ public class Client implements ActionListener {
                 }
                 // String encryptedKey = "";
                 // try {
-                //     encryptedKey = encrypt(keysKey, key);
+                // encryptedKey = encrypt(keysKey, key);
                 // } catch (Exception e) {
-                //     e.printStackTrace();
+                // e.printStackTrace();
                 // }
                 // System.out.println(encryptedKey);
-                
-                text = "@" + searchNames.get(num) + " /download " + encryptedKey + " " + ip + " " + searchFiles.get(num);
+
+                text = "@" + searchNames.get(num) + " /download " + encryptedKey + " " + ip + " "
+                        + searchFiles.get(num);
             } else {
                 enteredText.insert(help, enteredText.getText().length());
                 return;
@@ -351,24 +353,22 @@ public class Client implements ActionListener {
         thread.start(); // waiting for msgs
     }
 
+    static String randomKey() {
+        String key = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "0123456789" + "abcdefghijklmnopqrstuvxyz";
 
-    static String randomKey() { 
-        String key = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "0123456789" + "abcdefghijklmnopqrstuvxyz"; 
-        
-        StringBuilder sb = new StringBuilder(161); 
-        
-        for (int i = 0; i < 32; i++) { 
-         
-            int index = (int)(key.length() * Math.random()); 
-            
+        StringBuilder sb = new StringBuilder(161);
+
+        for (int i = 0; i < 32; i++) {
+
+            int index = (int) (key.length() * Math.random());
+
             sb.append(key.charAt(index));
-        } 
+        }
 
         String str = sb.toString();
-        
-        return str; 
-    } 
-   
+
+        return str;
+    }
 
     public String encrypt(String k, String str) throws Exception {
         byte[] decodedKey = Base64.getDecoder().decode(k);
@@ -378,8 +378,7 @@ public class Client implements ActionListener {
         cipher.init(Cipher.ENCRYPT_MODE, aesKey);
         byte[] encrypted = cipher.doFinal(str.getBytes());
         return new String(encrypted);
-      }
-
+    }
 
     /**
      * Closes socket and streams neatly
@@ -423,6 +422,7 @@ public class Client implements ActionListener {
 
     /**
      * Starts of the client side
+     * 
      * @throws NoSuchAlgorithmException
      */
     public static void main(String[] args) throws NoSuchAlgorithmException {

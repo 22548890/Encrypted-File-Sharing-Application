@@ -34,7 +34,13 @@ public class SendThread implements Runnable {
                 try {
                     FileInputStream fileIn = new FileInputStream(file);
                     int bytes = 0;
-                    byte[] buffer = new byte[1 * 1024];
+                    // byte[] buffer = new byte[1 * 1024];
+                    // buffer size 1% of file size
+                    int bufferSize = (int) file.length() / 100;
+                    if (bufferSize > 64 * 1024) {
+                        bufferSize = 64 * 1024;
+                    }
+                    byte[] buffer = new byte[bufferSize];
                     oos.writeObject(file.getName());
                     oos.writeObject(file.length());
                     int fileSize = (int) file.length();
@@ -45,17 +51,17 @@ public class SendThread implements Runnable {
                         sent += bytes;
                         progressBar.setValue((int) (sent * 100 / fileSize));
 
-                        try {
-                            // if file size is > 5MB, sleep for 1ms
-                            if (fileSize > 5 * 1024 * 1024) {
-                                Thread.sleep(0);
-                            } else {
-                                Thread.sleep(10);
-                            }
+                        // try {
+                        // // if file size is > 5MB, sleep for 1ms
+                        // if (fileSize > 5 * 1024 * 1024) {
+                        // Thread.sleep(0);
+                        // } else {
+                        // Thread.sleep(10);
+                        // }
 
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                        // } catch (InterruptedException e) {
+                        // e.printStackTrace();
+                        // }
                         oos.write(buffer, 0, bytes);
                     }
                     oos.flush();
@@ -76,7 +82,9 @@ public class SendThread implements Runnable {
             }
         }
 
-        try {
+        try
+
+        {
             if (oos != null) {
                 oos.close();
             }

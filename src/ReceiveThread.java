@@ -34,9 +34,14 @@ public class ReceiveThread implements Runnable {
             long size = (long) ois.readObject();
             int fileSize = (int) size;
 
-            // calculate chunk size of size bytes based on fileSize
+            // calculate buffer size to be 1% of file size
+            int bufferSize = fileSize / 100;
+            if (bufferSize > 64 * 1024) {
+                bufferSize = 64 * 1024;
+            }
+            byte[] buffer = new byte[bufferSize];
 
-            byte[] buffer = new byte[1 * 1024];
+            // byte[] buffer = new byte[1 * 1024];
             int read = 0;
             int totalRead = 0;
             int remaining = fileSize;
@@ -49,26 +54,26 @@ public class ReceiveThread implements Runnable {
                 isPaused = Client.isPaused;
                 while (isPaused) {
                     isPaused = Client.isPaused;
-                    try {
-                        Thread.sleep(1);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    // try {
+                    // Thread.sleep(1);
+                    // } catch (InterruptedException e) {
+                    // e.printStackTrace();
+                    // }
                     // System.out.println("paused");
                 }
                 fos.write(buffer, 0, read);
                 progressBar.setValue((int) (totalRead * 100 / fileSize));
 
-                try {
-                    // if file size is > 5MB, sleep for 1ms
-                    if (fileSize > 5 * 1024 * 1024) {
-                        Thread.sleep(0);
-                    } else {
-                        Thread.sleep(10);
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                // try {
+                // // if file size is > 5MB, sleep for 1ms
+                // if (fileSize > 5 * 1024 * 1024) {
+                // Thread.sleep(0);
+                // } else {
+                // Thread.sleep(10);
+                // }
+                // } catch (InterruptedException e) {
+                // e.printStackTrace();
+                // }
             }
         } catch (IOException e) {
             e.printStackTrace();
