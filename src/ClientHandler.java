@@ -4,7 +4,6 @@ import java.util.*;
 import javax.swing.DefaultListModel;
 import javax.swing.JTextArea;
 
-
 /**
  * Threads that handle each client
  */
@@ -18,7 +17,7 @@ public class ClientHandler implements Runnable {
     private Socket socket;
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
-    
+
     private JTextArea enteredText;
     private DefaultListModel<String> listModelUsers;
     private DefaultListModel<String> listModelRooms;
@@ -33,7 +32,8 @@ public class ClientHandler implements Runnable {
      * @param listModelUsers
      * @param enteredText
      */
-    public ClientHandler(Socket socket, JTextArea enteredText, DefaultListModel<String> listModelUsers, DefaultListModel<String> listModelRooms, int portCount) {
+    public ClientHandler(Socket socket, JTextArea enteredText, DefaultListModel<String> listModelUsers,
+            DefaultListModel<String> listModelRooms, int portCount) {
         try {
             this.socket = socket;
             this.oos = new ObjectOutputStream(socket.getOutputStream());
@@ -53,7 +53,6 @@ public class ClientHandler implements Runnable {
             closeEverything();
         }
     }
-
 
     /**
      * Handle commands AKA message starting with '/'
@@ -128,7 +127,6 @@ public class ClientHandler implements Runnable {
         }
     }
 
-
     /**
      * Send message to current room
      * 
@@ -152,7 +150,6 @@ public class ClientHandler implements Runnable {
         }
     }
 
-
     /**
      * Send message to all clients
      * 
@@ -169,7 +166,6 @@ public class ClientHandler implements Runnable {
         }
     }
 
-
     /**
      * Send messages with and handles some exceptions
      * 
@@ -183,7 +179,7 @@ public class ClientHandler implements Runnable {
             usernames.add(parts[0].substring(1));
             text = parts[1];
         }
-        if(text.startsWith("/download ") || text.startsWith("/key ")) {
+        if (text.startsWith("/download ") || text.startsWith("/key ")) {
             for (ClientHandler handler : clientHandlers) {
                 if (handler.username.equals(usernames.get(0))) {
                     try {
@@ -239,7 +235,6 @@ public class ClientHandler implements Runnable {
         }
     }
 
-
     /**
      * Ensures that username is unique once returned
      */
@@ -267,7 +262,6 @@ public class ClientHandler implements Runnable {
         }
     }
 
-
     /**
      * Sends user list to client
      */
@@ -293,7 +287,6 @@ public class ClientHandler implements Runnable {
         }
     }
 
-
     /**
      * Remove client and send messages
      */
@@ -305,7 +298,6 @@ public class ClientHandler implements Runnable {
         enteredText.insert("Client " + username + " Disconnected!\n", enteredText.getText().length());
 
     }
-
 
     /**
      * Neatly closes sockets and input output streams
@@ -327,8 +319,7 @@ public class ClientHandler implements Runnable {
         }
     }
 
-
-     /**
+    /**
      * The thread listens for messages from the client and handles it
      */
     @Override
@@ -342,7 +333,6 @@ public class ClientHandler implements Runnable {
         } catch (IOException e1) {
             e1.printStackTrace();
         }
-        
 
         enteredText.insert("New Client " + this.username + " Connected!\n", enteredText.getText().length());
 

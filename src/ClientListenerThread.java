@@ -200,21 +200,21 @@ public class ClientListenerThread implements Runnable {
     }
 
     // private String decrypt(String t) {
-    //     // byte[] decodedKey = Base64.getDecoder().decode(secret);
-    //     try {
-    //         Cipher cipher = Cipher.getInstance("AES");
-    //         Key aesKey = new SecretKeySpec(Client.keysKey.getBytes(), "AES");
-    //         cipher.init(Cipher.DECRYPT_MODE, aesKey);
-    //         byte[] b = t.getBytes();
-    //         // byte[] c = new byte[b.length + 16 - (b.length % 16)];
-    //         // System.out.println(c.length);
-    //         String decrypted = new String(Base64.getDecoder().decode(cipher.doFinal(b)));
-    //         return decrypted;
-    //     }
-    //     catch(Exception e) {
-    //         e.printStackTrace();
-    //     }
-    //     return null;
+    // // byte[] decodedKey = Base64.getDecoder().decode(secret);
+    // try {
+    // Cipher cipher = Cipher.getInstance("AES");
+    // Key aesKey = new SecretKeySpec(Client.keysKey.getBytes(), "AES");
+    // cipher.init(Cipher.DECRYPT_MODE, aesKey);
+    // byte[] b = t.getBytes();
+    // // byte[] c = new byte[b.length + 16 - (b.length % 16)];
+    // // System.out.println(c.length);
+    // String decrypted = new String(Base64.getDecoder().decode(cipher.doFinal(b)));
+    // return decrypted;
+    // }
+    // catch(Exception e) {
+    // e.printStackTrace();
+    // }
+    // return null;
     // }
 
     /**
