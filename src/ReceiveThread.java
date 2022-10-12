@@ -10,15 +10,16 @@ public class ReceiveThread implements Runnable {
     private JProgressBar progressBar;
     private boolean isPaused;
     private JTextArea enteredText;
+    private int port;
 
-    public ReceiveThread(JProgressBar progressBar, JTextArea enteredText) {
+    public ReceiveThread(JProgressBar progressBar, JTextArea enteredText, int port) {
         this.progressBar = progressBar;
         this.enteredText = enteredText;
+        this.port = port;
     }
 
     @Override
     public void run() {
-        int port = 12346;
 
         ServerSocket serverSocket = null;
         Socket socket = null;

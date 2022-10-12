@@ -6,17 +6,18 @@ public class SendThread implements Runnable {
     private String host, fileName;
     // private boolean isPausedUploaded;
     private JProgressBar progressBar;
+    private int port;
 
-    public SendThread(String host, String fileName, JProgressBar progressBar) {
+    public SendThread(String host, String fileName, JProgressBar progressBar, int port) {
         this.host = host;
         this.fileName = fileName;
         this.progressBar = progressBar;
+        this.port = port;
 
     }
 
     @Override
     public void run() {
-        int port = 12346;
 
         Socket socket = null;
         ObjectOutputStream oos = null;

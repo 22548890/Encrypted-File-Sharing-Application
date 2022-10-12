@@ -146,10 +146,11 @@ public class ClientListenerThread implements Runnable {
             }
             return;
         } else if (message.text().startsWith("/download ")) {
-            String parts[] = message.text().split(" ", 4);
+            String parts[] = message.text().split(" ", 5);
             String key = parts[1];
             String host = parts[2];
-            String filename = parts[3];
+            int sendPort = Integer.parseInt(parts[3]);
+            String filename = parts[4];
             // message dialog for upload
             // get username of host
 
@@ -163,7 +164,7 @@ public class ClientListenerThread implements Runnable {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                Thread thread = new Thread(new SendThread(host, filename, Client.progressBarUpload));
+                Thread thread = new Thread(new SendThread(host, filename, Client.progressBarUpload, sendPort));
                 thread.start();
             }
             return;
@@ -176,7 +177,7 @@ public class ClientListenerThread implements Runnable {
                 // String dec = decrypt(key);
                 // System.out.println(dec);
                 if (Client.encryptedKey.equals(key)) {
-                    Thread thread = new Thread(new ReceiveThread(Client.progressBar, enteredText));
+                    Thread thread = new Thread(new ReceiveThread(Client.progressBar, enteredText, Client.receivePort));
                     thread.start();
                 } else {
                     enteredText.insert("SERVER: keys do not match\n", enteredText.getText().length());
@@ -257,6 +258,8 @@ public class ClientListenerThread implements Runnable {
     public void run() {
         if (socket.isConnected()) {
             try {
+                Client.receivePort = ois.readInt();
+
                 ArrayList<String> usernames = (ArrayList<String>) ois.readObject();
                 for (String name : usernames) {
                     listModelUsers.addElement(name);

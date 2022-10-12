@@ -23,6 +23,7 @@ public class ClientHandler implements Runnable {
     private DefaultListModel<String> listModelUsers;
     private DefaultListModel<String> listModelRooms;
 
+    private int portCount;
 
     /**
      * Constructor for this handler
@@ -32,7 +33,7 @@ public class ClientHandler implements Runnable {
      * @param listModelUsers
      * @param enteredText
      */
-    public ClientHandler(Socket socket, JTextArea enteredText, DefaultListModel<String> listModelUsers, DefaultListModel<String> listModelRooms) {
+    public ClientHandler(Socket socket, JTextArea enteredText, DefaultListModel<String> listModelUsers, DefaultListModel<String> listModelRooms, int portCount) {
         try {
             this.socket = socket;
             this.oos = new ObjectOutputStream(socket.getOutputStream());
@@ -41,6 +42,7 @@ public class ClientHandler implements Runnable {
             this.enteredText = enteredText;
             this.listModelUsers = listModelUsers;
             this.listModelRooms = listModelRooms;
+            this.portCount = portCount;
 
             if (rooms.size() == 0) {
                 rooms.add(room);
@@ -333,6 +335,14 @@ public class ClientHandler implements Runnable {
     public void run() {
 
         ensureUsername(); // check username uniqueness
+
+        try {
+            oos.writeInt(portCount);
+            oos.flush();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        
 
         enteredText.insert("New Client " + this.username + " Connected!\n", enteredText.getText().length());
 

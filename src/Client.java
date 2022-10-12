@@ -48,6 +48,8 @@ public class Client implements ActionListener {
     public static String key, mainKey, keysKey;
     public static String encryptedKey;
 
+    public static int receivePort;
+
     /**
      * Constructor forPerforms actions regarding the GUI
      * 
@@ -301,11 +303,11 @@ public class Client implements ActionListener {
                 try {
                     num = Integer.parseInt(index);
                 } catch (NumberFormatException e) {
-                    enteredText.insert("Index given is not an integer", enteredText.getText().length());
+                    enteredText.insert("Index given is not an integer\n", enteredText.getText().length());
                     return;
                 }
                 if (num < 0 || num >= searchFiles.size()) {
-                    enteredText.insert("Index is out of bounds", enteredText.getText().length());
+                    enteredText.insert("Index is out of bounds\n", enteredText.getText().length());
                     return;
                 }
 
@@ -323,7 +325,7 @@ public class Client implements ActionListener {
                 // }
                 // System.out.println(encryptedKey);
 
-                text = "@" + searchNames.get(num) + " /download " + encryptedKey + " " + ip + " "
+                text = "@" + searchNames.get(num) + " /download " + encryptedKey + " " + ip + " " + receivePort + " "
                         + searchFiles.get(num);
             } else {
                 enteredText.insert(help, enteredText.getText().length());
@@ -377,7 +379,8 @@ public class Client implements ActionListener {
         // encrypt the text
         cipher.init(Cipher.ENCRYPT_MODE, aesKey);
         byte[] encrypted = cipher.doFinal(str.getBytes());
-        return new String(encrypted);
+        String s = new String(encrypted);
+        return s.replaceAll(" ","x");
     }
 
     /**

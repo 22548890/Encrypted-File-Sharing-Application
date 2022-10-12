@@ -21,6 +21,7 @@ public class Server {
     private DefaultListModel<String> listModelRooms;
     private JList<String> roomsList;
     public static String mainKey;
+    private int portCount;
 
 
     /**
@@ -31,7 +32,7 @@ public class Server {
     public Server(ServerSocket serverSocket) {
         this.serverSocket = serverSocket;
         this.mainKey = "ddebf573527a51e64c2d95ad3a627ed350ed3fd6fa074c1ac411a4eb2ae425a7";
-
+        this.portCount = 12346;
         frame = new JFrame();
 
         // create button with image record.png
@@ -88,8 +89,8 @@ public class Server {
             while (!serverSocket.isClosed()) {
                 Socket socket = serverSocket.accept();
 
-                ClientHandler clientHandler = new ClientHandler(socket, enteredText, listModelUsers, listModelRooms);
-                
+                ClientHandler clientHandler = new ClientHandler(socket, enteredText, listModelUsers, listModelRooms, portCount);
+                portCount++;
                 Thread thread = new Thread(clientHandler);
                 thread.start();
             }
