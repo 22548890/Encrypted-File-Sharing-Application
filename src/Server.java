@@ -3,7 +3,6 @@ import java.net.*;
 import java.awt.*;
 import javax.swing.*;
 
-
 /**
  * Class for Server
  * 
@@ -22,7 +21,6 @@ public class Server {
     private JList<String> roomsList;
     public static String mainKey;
     private int portCount;
-
 
     /**
      * Constructor for ServerSocket and setup of GUI
@@ -80,7 +78,6 @@ public class Server {
         typedText.requestFocusInWindow();
     }
 
-
     /**
      * The method that creates threads for handling each client
      */
@@ -89,7 +86,8 @@ public class Server {
             while (!serverSocket.isClosed()) {
                 Socket socket = serverSocket.accept();
 
-                ClientHandler clientHandler = new ClientHandler(socket, enteredText, listModelUsers, listModelRooms, portCount);
+                ClientHandler clientHandler = new ClientHandler(socket, enteredText, listModelUsers, listModelRooms,
+                        portCount);
                 portCount++;
                 Thread thread = new Thread(clientHandler);
                 thread.start();
@@ -100,7 +98,6 @@ public class Server {
         }
 
     }
-
 
     /**
      * Method that closes server socket
@@ -114,7 +111,6 @@ public class Server {
             e.printStackTrace();
         }
     }
-
 
     /**
      * Startup of server
