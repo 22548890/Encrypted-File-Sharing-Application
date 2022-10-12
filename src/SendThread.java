@@ -20,12 +20,15 @@ public class SendThread implements Runnable {
 
         Socket socket = null;
         ObjectOutputStream oos = null;
-        try {
-            socket = new Socket(host, port);
-            oos = new ObjectOutputStream(socket.getOutputStream());
-        } catch (IOException e) {
-            e.printStackTrace();
+        while (true) {
+            try {
+                socket = new Socket(host, port);
+                oos = new ObjectOutputStream(socket.getOutputStream());
+                break;
+            } catch (IOException e) {
+            }
         }
+
         for (File file : Client.uploadedFiles) {
             if (file.getName().equals(fileName)) {
                 try {

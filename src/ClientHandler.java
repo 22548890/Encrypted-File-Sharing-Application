@@ -181,7 +181,7 @@ public class ClientHandler implements Runnable {
             usernames.add(parts[0].substring(1));
             text = parts[1];
         }
-        if(text.startsWith("/download ")) {
+        if(text.startsWith("/download ") || text.startsWith("/key ")) {
             for (ClientHandler handler : clientHandlers) {
                 if (handler.username.equals(usernames.get(0))) {
                     try {

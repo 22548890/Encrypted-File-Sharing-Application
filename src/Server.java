@@ -20,6 +20,7 @@ public class Server {
     private JList<String> usersList;
     private DefaultListModel<String> listModelRooms;
     private JList<String> roomsList;
+    public static String mainKey;
 
 
     /**
@@ -29,6 +30,7 @@ public class Server {
      */
     public Server(ServerSocket serverSocket) {
         this.serverSocket = serverSocket;
+        this.mainKey = "ddebf573527a51e64c2d95ad3a627ed350ed3fd6fa074c1ac411a4eb2ae425a7";
 
         frame = new JFrame();
 

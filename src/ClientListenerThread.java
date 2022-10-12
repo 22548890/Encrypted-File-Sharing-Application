@@ -18,7 +18,6 @@ public class ClientListenerThread implements Runnable {
     private JTextArea enteredText;
     private DefaultListModel<String> listModelUsers;
     private DefaultListModel<String> listModelRooms;
-    private JProgressBar progressBar;
     public static boolean isPaused;
 
     /**
@@ -33,8 +32,7 @@ public class ClientListenerThread implements Runnable {
      */
     public ClientListenerThread(String username, Socket socket, ObjectInputStream ois, ObjectOutputStream oos,
             JFrame frame,
-            JTextArea enteredText, DefaultListModel<String> listModelUsers, DefaultListModel<String> listModelRooms,
-            JProgressBar progressBar) {
+            JTextArea enteredText, DefaultListModel<String> listModelUsers, DefaultListModel<String> listModelRooms) {
         this.username = username;
         this.socket = socket;
         this.ois = ois;
@@ -43,7 +41,6 @@ public class ClientListenerThread implements Runnable {
         this.enteredText = enteredText;
         this.listModelUsers = listModelUsers;
         this.listModelRooms = listModelRooms;
-        this.progressBar = progressBar;
     }
 
     public String search(String str) {
@@ -149,9 +146,10 @@ public class ClientListenerThread implements Runnable {
             }
             return;
         } else if (message.text().startsWith("/download ")) {
-            String parts[] = message.text().split(" ", 3);
-            String host = parts[1];
-            String filename = parts[2];
+            String parts[] = message.text().split(" ", 4);
+            String key = parts[1];
+            String host = parts[2];
+            String filename = parts[3];
             // message dialog for upload
             // get username of host
 
@@ -159,10 +157,32 @@ public class ClientListenerThread implements Runnable {
                     "Do you accept the download request " + filename + " from " + message.from() + "?", "Download",
                     JOptionPane.YES_NO_OPTION);
             if (reply == JOptionPane.YES_OPTION) {
-                Thread thread = new Thread(new SendThread(host, filename, progressBar));
+                try {
+                    oos.writeObject(new Message("@" + message.from() + " /key " + key, username));
+                    oos.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Thread thread = new Thread(new SendThread(host, filename, Client.progressBarUpload));
                 thread.start();
             }
             return;
+        } else if (message.text().startsWith("/key ")) {
+            if (message.from().equals(username)) {
+                return;
+            } else {
+                String key = message.text().split("/key ", 2)[1];
+                // System.out.println(key);
+                // String dec = decrypt(key);
+                // System.out.println(dec);
+                if (Client.encryptedKey.equals(key)) {
+                    Thread thread = new Thread(new ReceiveThread(Client.progressBar, enteredText));
+                    thread.start();
+                } else {
+                    enteredText.insert("SERVER: keys do not match\n", enteredText.getText().length());
+                }
+                return;
+            }
         }
         // else if paused pause sending
         else {
@@ -177,6 +197,24 @@ public class ClientListenerThread implements Runnable {
         String text = message.from() + ": " + message.text();
         enteredText.insert(text + "\n", enteredText.getText().length());
     }
+
+    // private String decrypt(String t) {
+    //     // byte[] decodedKey = Base64.getDecoder().decode(secret);
+    //     try {
+    //         Cipher cipher = Cipher.getInstance("AES");
+    //         Key aesKey = new SecretKeySpec(Client.keysKey.getBytes(), "AES");
+    //         cipher.init(Cipher.DECRYPT_MODE, aesKey);
+    //         byte[] b = t.getBytes();
+    //         // byte[] c = new byte[b.length + 16 - (b.length % 16)];
+    //         // System.out.println(c.length);
+    //         String decrypted = new String(Base64.getDecoder().decode(cipher.doFinal(b)));
+    //         return decrypted;
+    //     }
+    //     catch(Exception e) {
+    //         e.printStackTrace();
+    //     }
+    //     return null;
+    // }
 
     /**
      * Closes socket and streams neatly and exits

@@ -1,8 +1,14 @@
 import java.io.*;
 import java.net.*;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.awt.*;
 import java.awt.event.*;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
@@ -38,12 +44,17 @@ public class Client implements ActionListener {
 
     public static String ip;
 
+    // public static String strKey, strMainKey, strKeysKey;
+    public static String key, mainKey, keysKey;
+    public static String encryptedKey;
+
     /**
      * Constructor forPerforms actions regarding the GUI
      * 
      * @param e for the action performed
+     * @throws NoSuchAlgorithmException
      */
-    public Client(Socket socket, ObjectInputStream ois, ObjectOutputStream oos, String username) {
+    public Client(Socket socket, ObjectInputStream ois, ObjectOutputStream oos, String username) throws NoSuchAlgorithmException {
         this.socket = socket;
         this.ois = ois;
         this.oos = oos;
@@ -53,6 +64,8 @@ public class Client implements ActionListener {
         searchNames = new ArrayList<String>();
         searchNum = -1;
         isPaused = false;
+        // mainKey = "ddebf573527a51e64c2d95ad3a627ed350ed3fd6fa074c1ac411a4eb2ae425a7";
+        keysKey = randomKey();
 
         // this.uploadsDir = "uploads";
         // downloadsDir = "downloads/";
@@ -294,11 +307,22 @@ public class Client implements ActionListener {
                     enteredText.insert("Index is out of bounds", enteredText.getText().length());
                     return;
                 }
-
-                text = "@" + searchNames.get(num) + " /download " + ip + " " + searchFiles.get(num);
-
-                Thread thread = new Thread(new ReceiveThread(progressBar, enteredText));
-                thread.start();
+            
+                key = randomKey();
+                try {
+                    encryptedKey = encrypt(keysKey, key);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                // String encryptedKey = "";
+                // try {
+                //     encryptedKey = encrypt(keysKey, key);
+                // } catch (Exception e) {
+                //     e.printStackTrace();
+                // }
+                // System.out.println(encryptedKey);
+                
+                text = "@" + searchNames.get(num) + " /download " + encryptedKey + " " + ip + " " + searchFiles.get(num);
             } else {
                 enteredText.insert(help, enteredText.getText().length());
                 return;
@@ -322,10 +346,40 @@ public class Client implements ActionListener {
     public void listenForMessage() {
         ClientListenerThread clientListenerThread = new ClientListenerThread(username, socket, ois, oos, frame,
                 enteredText,
-                listModelUsers, listModelRooms, progressBarUpload);
+                listModelUsers, listModelRooms);
         Thread thread = new Thread(clientListenerThread);
         thread.start(); // waiting for msgs
     }
+
+
+    static String randomKey() { 
+        String key = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "0123456789" + "abcdefghijklmnopqrstuvxyz"; 
+        
+        StringBuilder sb = new StringBuilder(161); 
+        
+        for (int i = 0; i < 32; i++) { 
+         
+            int index = (int)(key.length() * Math.random()); 
+            
+            sb.append(key.charAt(index));
+        } 
+
+        String str = sb.toString();
+        
+        return str; 
+    } 
+   
+
+    public String encrypt(String k, String str) throws Exception {
+        byte[] decodedKey = Base64.getDecoder().decode(k);
+        Key aesKey = new SecretKeySpec(decodedKey, "AES");
+        Cipher cipher = Cipher.getInstance("AES");
+        // encrypt the text
+        cipher.init(Cipher.ENCRYPT_MODE, aesKey);
+        byte[] encrypted = cipher.doFinal(str.getBytes());
+        return new String(encrypted);
+      }
+
 
     /**
      * Closes socket and streams neatly
@@ -369,8 +423,9 @@ public class Client implements ActionListener {
 
     /**
      * Starts of the client side
+     * @throws NoSuchAlgorithmException
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NoSuchAlgorithmException {
         int port = 12345;
         Socket socket = null;
 
