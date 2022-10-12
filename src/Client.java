@@ -250,7 +250,7 @@ public class Client implements ActionListener {
      */
     public void sendMessage(String text) {
         if (text.startsWith("/")) {
-            String help = "Commands: \n- /exit - shut down application\n- /create <name> - create room\n- /join <room> - join that room\n- /myfiles - list of my uploaded files\n -/search - search for file substring name\n -/download - request to download file\n- /help - show help\n";
+            String help = "Commands: \n- /exit - shut down application\n- /create <name> - create room\n- /join <room> - join that room\n- /myfiles - list of my uploaded files\n- /search - search for file substring name\n- /download - request to download file\n- /help - show help\n";
             if (text.equals("/exit")) {
                 closeEverything();
             } else if (text.equals("/help")) {
